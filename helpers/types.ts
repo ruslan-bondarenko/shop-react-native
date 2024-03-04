@@ -1,5 +1,5 @@
 export type ICategory = {
- id: number,
+ id?: number,
  name: string, 
  image: string, 
  creationAt: string, 
@@ -7,10 +7,10 @@ export type ICategory = {
 };
 
 export type IProduct = {
- id: number,
+ id?: number,
  title: string,
  price: number,
  description: string,
- category: ICategory,
+ category?: ICategory,
  images: string[]
 };

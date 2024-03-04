@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { Ionicons } from "@expo/vector-icons";
+
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, fetchProducts } from "../../store";
+
 import { RootStackParamList } from "../../Navigator";
-import { globalStyles } from "../../styles";
-import { IProduct } from "../../helpers";
-import { ProductCard } from "../../components";
-// import { Entypo } from "@expo/vector-icons";
+import { ProductCard, AddProductModal } from "../../components";
+import type { IProduct } from "../../helpers";
+
+import { globalStyles, loadingStyles, errorStyles } from "../../styles";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -14,39 +19,59 @@ type Props = {
 };
 
 const Home: React.FC<Props> = ({ navigation }) => {
-  const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
+  const { data, isLoading, error } = useSelector(
+    (state: RootState) => state.products
+  );
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await fetch(
-          "https://api.escuelajs.co/api/v1/products?offset=0&limit=10"
-        ).then((res) => res.json());
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    fetchProducts();
+    dispatch(fetchProducts() as any);
   }, []);
+
+  useEffect(() => {
+    console.log("data", data);
+  }, [data]);
 
   return (
     <View style={globalStyles.container}>
       <View style={styles.top}>
         <Text style={globalStyles.title}>Products</Text>
-        {/* <Entypo name="plus" size={24} color="black" /> */}
+        <Ionicons
+          name="add"
+          size={32}
+          color="black"
+          onPress={() => setIsModalOpen(true)}
+        />
       </View>
 
-      {products.length ? (
+      <AddProductModal
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+      />
+
+      {isLoading && (
+        <View style={loadingStyles.container}>
+          <Text style={loadingStyles.title}>Loading...</Text>
+        </View>
+      )}
+
+      {!isLoading && data.length ? (
         <FlatList
           contentContainerStyle={{ gap: 16 }}
-          data={products}
+          data={data}
           renderItem={({ item }: { item: IProduct }) => (
             <ProductCard navigation={navigation} item={item} />
           )}
         />
       ) : null}
+
+      {!!error && (
+        <View style={errorStyles.container}>
+          <Text style={errorStyles.title}>{error}</Text>
+        </View>
+      )}
     </View>
   );
 };

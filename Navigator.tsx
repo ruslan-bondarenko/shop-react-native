@@ -3,7 +3,7 @@ import { Home, About, Product } from "./pages";
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { IProduct } from "./helpers";
+import type { IProduct } from "./helpers";
 import { headerStyles } from "./styles";
 
 export type RootStackParamList = {

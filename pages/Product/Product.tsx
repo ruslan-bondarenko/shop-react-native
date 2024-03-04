@@ -4,6 +4,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../Navigator"; // Подставьте правильный путь
 import { globalStyles } from "../../styles";
+import { parseImages } from "../../helpers";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 type PostScreenRouteProp = RouteProp<RootStackParamList, "Product">;
@@ -15,8 +16,10 @@ type Props = {
 
 const Product: React.FC<Props> = ({ route }) => {
   const { title, images, price, category } = route.params;
-  const mainImage = images[0];
-  const otherImages = images.slice(1);
+
+  const mainImage = parseImages(images)[0];
+  const otherImages = parseImages(images).slice(1);
+
   return (
     <View style={globalStyles.container}>
       <View style={styles.gallery}>
@@ -29,22 +32,24 @@ const Product: React.FC<Props> = ({ route }) => {
           />
         </View>
 
-        <View style={styles.otherImagesContainer}>
-          <FlatList
-            data={otherImages}
-            contentContainerStyle={{ gap: 8 }}
-            horizontal
-            renderItem={({ item }) => (
-              <Image
-                style={styles.otherImage}
-                source={{
-                  uri: item,
-                }}
-              />
-            )}
-            keyExtractor={(item) => item}
-          />
-        </View>
+        {!!otherImages && (
+          <View style={styles.otherImagesContainer}>
+            <FlatList
+              data={otherImages}
+              contentContainerStyle={{ gap: 8 }}
+              horizontal
+              renderItem={({ item }) => (
+                <Image
+                  style={styles.otherImage}
+                  source={{
+                    uri: item,
+                  }}
+                />
+              )}
+              keyExtractor={(item) => item}
+            />
+          </View>
+        )}
       </View>
 
       <View style={styles.main}>
@@ -52,7 +57,7 @@ const Product: React.FC<Props> = ({ route }) => {
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.price}>${price}</Text>
         </View>
-        <Text style={styles.text}>{category.name}</Text>
+        <Text style={styles.text}>{category?.name}</Text>
       </View>
       <Text>{route.params.description}</Text>
     </View>
@@ -92,6 +97,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontFamily: "aeonik-bold",
+    maxWidth: "80%",
   },
   text: {
     fontSize: 14,

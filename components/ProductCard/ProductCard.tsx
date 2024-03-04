@@ -5,10 +5,17 @@ import {
   Image,
   StyleSheet,
   View,
+  Alert,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { useDispatch } from "react-redux";
+
 import { RootStackParamList } from "../../Navigator";
-import { IProduct } from "../../helpers";
+
+import { IProduct, parseImages } from "../../helpers";
+import { deleteProduct } from "../../store/slices/productsSlice";
+import { AppDispatch } from "../../store";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -18,6 +25,18 @@ type Props = {
 };
 
 export const ProductCard: FC<Props> = ({ navigation, item }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleAlertDelete = () =>
+    Alert.alert("Are u sure?", `u will delete product with id: ${item.id}`, [
+      { text: "Yes", onPress: () => dispatch(deleteProduct(item?.id || "")) },
+      {
+        text: "No",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel",
+      },
+    ]);
+
   return (
     <TouchableWithoutFeedback
       onPress={() => navigation.navigate("Product", item)}
@@ -26,15 +45,21 @@ export const ProductCard: FC<Props> = ({ navigation, item }) => {
         <Image
           style={styles.image}
           source={{
-            uri: item.images[0],
+            uri: parseImages(item.images)[0] || "https://placehold.co/500x500",
           }}
         />
+        <View style={styles.deleteIcon}>
+          <TouchableWithoutFeedback onPress={() => handleAlertDelete()}>
+            <AntDesign name="delete" size={24} color="black" />
+          </TouchableWithoutFeedback>
+        </View>
+
         <View style={styles.main}>
           <View style={styles.top}>
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.price}>${item.price}</Text>
           </View>
-          <Text style={styles.text}>{item.category.name}</Text>
+          <Text style={styles.text}>{item?.category?.name || ""}</Text>
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -67,6 +92,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontFamily: "aeonik-bold",
+    maxWidth: "80%",
   },
   text: {
     fontSize: 14,
@@ -76,5 +102,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "900",
     color: "#050",
+  },
+  deleteIcon: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "#ccc",
+    padding: 8,
+    borderRadius: 8,
   },
 });

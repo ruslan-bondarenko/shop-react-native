@@ -3,6 +3,8 @@ import * as Font from "expo-font";
 import React, { useState } from "react";
 import AppLoading from "expo-app-loading";
 import MainStack from "./Navigator";
+import { Provider } from "react-redux";
+import { store } from "./store";
 
 const fonts = () =>
   Font.loadAsync({
@@ -17,17 +19,19 @@ const fonts = () =>
 export default function App() {
   const [isFontsLoaded, setIsFontsLoaded] = useState<boolean>(false);
 
-  if (isFontsLoaded) {
-    return <MainStack />;
-  } else {
-    return (
-      <AppLoading
-        startAsync={fonts}
-        onFinish={() => setIsFontsLoaded(true)}
-        onError={console.warn}
-      />
-    );
-  }
+  return (
+    <Provider store={store}>
+      {isFontsLoaded ? (
+        <MainStack />
+      ) : (
+        <AppLoading
+          startAsync={fonts}
+          onFinish={() => setIsFontsLoaded(true)}
+          onError={console.warn}
+        />
+      )}
+    </Provider>
+  );
 }
 
 const styles = StyleSheet.create({});
