@@ -97,6 +97,9 @@ export const productsSlice = createSlice({
   name: "products",
   initialState,
   reducers: {
+    setLoadingState: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
+    },
     setProductsData: (state, action: PayloadAction<IProduct[]>) => {
       state.data = action.payload;
     },
@@ -128,6 +131,6 @@ export const productsSlice = createSlice({
   },
 });
 
-export const { setProductsData } = productsSlice.actions;
+export const { setProductsData, setLoadingState } = productsSlice.actions;
 
 export default productsSlice.reducer;

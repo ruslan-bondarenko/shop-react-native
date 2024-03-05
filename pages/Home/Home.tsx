@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -11,6 +17,7 @@ import { ProductCard, AddProductModal } from "../../components";
 import type { IProduct } from "../../helpers";
 
 import { globalStyles, loadingStyles, errorStyles } from "../../styles";
+import { RefreshControl } from "react-native-gesture-handler";
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, "Home">;
 
@@ -29,10 +36,6 @@ const Home: React.FC<Props> = ({ navigation }) => {
   useEffect(() => {
     dispatch(fetchProducts() as any);
   }, []);
-
-  useEffect(() => {
-    console.log("data", data);
-  }, [data]);
 
   return (
     <View style={globalStyles.container}>
@@ -53,12 +56,19 @@ const Home: React.FC<Props> = ({ navigation }) => {
 
       {isLoading && (
         <View style={loadingStyles.container}>
+          <ActivityIndicator size="large" />
           <Text style={loadingStyles.title}>Loading...</Text>
         </View>
       )}
 
       {!isLoading && data.length ? (
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={() => dispatch(fetchProducts() as any)}
+            />
+          }
           contentContainerStyle={{ gap: 16 }}
           data={data}
           renderItem={({ item }: { item: IProduct }) => (

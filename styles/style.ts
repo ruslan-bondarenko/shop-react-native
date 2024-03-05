@@ -43,6 +43,8 @@ export const modalStyles = StyleSheet.create({
 
 export const loadingStyles = StyleSheet.create({
  container: {
+  flex: 1,
+  gap: 12,
   alignItems: 'center',
   justifyContent: 'center',
  },
